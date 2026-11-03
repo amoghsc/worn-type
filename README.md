@@ -2,9 +2,7 @@
 
 Give a whole font one consistent worn, letterpress look: eroded edges, blunted
 corners, chipped thin strokes, ink spread and blots. Each glyph gets a few
-slightly different variations, so no two letters print quite alike. The result
-downloads as a renamed copy of the font that swaps the variations in by itself
-(OpenType `rand` / `calt`).
+slightly different variations, so no two letters print quite alike.
 
 **Use it:** https://amoghsc.github.io/worn-type/ (Chrome, Edge, Firefox or Safari on a computer).
 
@@ -18,13 +16,14 @@ downloads as a renamed copy of the font that swaps the variations in by itself
    each glyph gets and how much they differ. **New pattern** keeps the settings and reshuffles the wear.
 4. Check the paragraph: size, line height, letter spacing, alignment, colours.
    **T** flips worn / original. **A** animates: letters keep swapping variations, like hand-drawn film.
-5. **Download** builds the font. **Wear** sets which glyphs are included (the paragraph's, A–Z a–z 0–9,
-   every character, every glyph including conjuncts, or your own list).
-   **Save font** remembers the font and all settings in this browser, to reopen from **Saved**.
+5. **Download SVG** saves the paragraph exactly as it looks (the current animation frame too) as
+   vector shapes, to use in any design app.
 
-Everything runs in your browser; fonts are never uploaded anywhere. Check the source font's
-licence before sharing a worn copy (most Google Fonts are OFL: keep the licence, and if the font
-lists a Reserved Font Name, rename it under **Name**).
+Everything runs in your browser; fonts are never uploaded anywhere.
+
+**Worn font files** are built only on a local copy (see *Run locally*), where the save bar also has
+**Download** (a renamed copy of the font that swaps the variations in by itself, via OpenType
+`rand` / `calt`) and **Save font**. Check the source font's licence before sharing a worn copy.
 
 ## How it works
 
@@ -40,6 +39,8 @@ lists a Reserved Font Name, rename it under **Name**).
 - Variable fonts are saved at their default instance; CFF2 and .ttc aren't supported.
 
 ## Run locally
+
+On `localhost` the app also builds worn font files.
 
 ```
 python3 -m http.server -d public 5209

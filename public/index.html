@@ -94,7 +94,7 @@
   </div>
 
   <footer class="savebar">
-    <label class="field"><span>Wear</span>
+    <label class="field fontonly"><span>Wear</span>
       <select id="scope">
         <option value="text">characters in the paragraph</option>
         <option value="latin">A–Z a–z 0–9</option>
@@ -103,14 +103,16 @@
         <option value="custom">custom characters…</option>
       </select>
     </label>
-    <input id="customChars" placeholder="type characters" hidden>
-    <span id="scopeCount" class="mono hint"></span>
-    <label class="field"><span>Name</span><span class="mono" id="familyBase"></span><input id="suffix" value="Worn" size="10"></label>
-    <label class="field"><span>Saved</span><select id="projects"><option value="">open a saved font…</option></select></label>
+    <input id="customChars" class="fontonly" placeholder="type characters" hidden>
+    <span id="scopeCount" class="mono hint fontonly"></span>
+    <label class="field fontonly"><span>Name</span><span class="mono" id="familyBase"></span><input id="suffix" value="Worn" size="10"></label>
+    <label class="field fontonly"><span>Saved</span><select id="projects"><option value="">open a saved font…</option></select></label>
     <p id="status" class="status"></p>
-    <button id="save" class="btn" title="Remember this font and its settings in this browser, to reopen and keep editing">Save font</button>
-    <button id="download" class="btn primary" title="Build the worn font and download the file. Check the source font's licence before sharing it.">Download</button>
+    <button id="svg" class="btn" title="Download the paragraph as it looks now, as vector shapes (SVG)">Download SVG</button>
+    <button id="save" class="btn fontonly" title="Remember this font and its settings in this browser, to reopen and keep editing">Save font</button>
+    <button id="download" class="btn primary fontonly" title="Build the worn font and download the file. Check the source font's licence before sharing it.">Download</button>
   </footer>
+  <p class="credit">Created with Love using Claude code by Amogh (<a href="mailto:amoghsc@gmail.com">amoghsc@gmail.com</a>)</p>
 
   <script src="vendor/clipper.js"></script>
   <script src="vendor/opentype.min.js"></script>

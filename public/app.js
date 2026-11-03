@@ -283,23 +283,57 @@
     paraTimer = setTimeout(drawParagraph, delay);
   }
 
-  // choice[i]: which variation glyph i shows, or -1 for the original
-  function paintParagraph(choice) {
-    if (!para) return;
-    const { size, k, pad, lineH, h, vs } = para;
-    const { ctx } = frame($('#para'), h);
-    ctx.fillStyle = $('#pInk').value;
+  // choice[i]: which variation glyph i shows, or -1 for the original.
+  // Yields each visible glyph's outline and where it sits on the page.
+  function* placed(choice) {
+    const { size, k, pad, lineH, vs } = para;
     const s = 1 / state.scale; // clipper units → font units
-    layout.forEach((g, i) => {
+    for (const [i, g] of layout.entries()) {
       const o = outlineOf(g.gid);
-      if (o.empty || g.gid === 0) return; // no box for characters the font lacks
+      if (o.empty || g.gid === 0) continue; // no box for characters the font lacks
       const c = choice[i];
       const paths = (c >= 0 && vs[c] && readyOf(g.gid, vs[c])) || o.base;
       const by = pad + size * 0.95 + g.line * lineH;
-      tracePaths(ctx, paths, { k: k * s, ox: pad + g.x, oy: by - g.dy });
-      ctx.fill('evenodd');
       g.box = [pad + g.x, by - size, g.w, size * 1.3];
-    });
+      yield { paths, v: { k: k * s, ox: pad + g.x, oy: by - g.dy } };
+    }
+  }
+
+  let shown = [];
+  function paintParagraph(choice) {
+    if (!para) return;
+    shown = choice;
+    const { ctx } = frame($('#para'), para.h);
+    ctx.fillStyle = $('#pInk').value;
+    for (const { paths, v } of placed(choice)) {
+      tracePaths(ctx, paths, v);
+      ctx.fill('evenodd');
+    }
+  }
+
+  // the paragraph exactly as on screen (this animation frame too), as vector shapes
+  async function downloadSvg() {
+    if (!para) return;
+    const choice = shown.slice();
+    await Promise.all(layout.map((g, i) => choice[i] >= 0 && para.vs[choice[i]] && wornOf(g.gid, para.vs[choice[i]])));
+    const r = (n) => Math.round(n * 10) / 10;
+    const d = [];
+    for (const { paths, v } of placed(choice)) {
+      for (const p of paths) d.push('M' + p.map((pt) => r(v.ox + pt.X * v.k) + ' ' + r(v.oy - pt.Y * v.k)).join('L') + 'Z');
+    }
+    const w = Math.round($('#para').clientWidth), h = Math.round(para.h);
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">\n` +
+      `<rect width="100%" height="100%" fill="${$('#pBg').value}"/>\n` +
+      `<path fill="${$('#pInk').value}" fill-rule="evenodd" d="${d.join('')}"/>\n</svg>\n`;
+    const name = (state.font.names.fontFamily?.en || 'text').replace(/[^\w-]+/g, '') + (state.mode === 'worn' ? '-worn' : '') + '.svg';
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    setStatus(`Downloaded <b>${name}</b> (${Math.round(svg.length / 1024)} KB)`);
   }
 
   async function drawParagraph() {
@@ -897,7 +931,11 @@
 
   // ---------------------------------------------------------------- wiring
 
+  // Building font files is for local copies only; the shared site exports SVG
+  const HOSTED = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+
   async function init() {
+    document.body.classList.toggle('hosted', HOSTED);
     buildControls();
     for (const el of document.querySelectorAll('.paratools input[type=range]')) el.nextElementSibling.textContent = el.value;
     setStatus('Loading fonts…');
@@ -1010,12 +1048,15 @@
 
     $('#scope').addEventListener('change', updateScopeCount);
     $('#customChars').addEventListener('input', updateScopeCount);
-    $('#save').addEventListener('click', saveProject);
-    $('#download').addEventListener('click', download);
-    // start fetching the font writer once the pointer heads for the save bar
-    $('.savebar').addEventListener('pointerenter', () => warmWriter().catch(() => {}), { once: true });
-    $('#projects').addEventListener('change', (e) => openProject(e.target.value));
-    loadProjects();
+    $('#svg').addEventListener('click', downloadSvg);
+    if (!HOSTED) {
+      $('#save').addEventListener('click', saveProject);
+      $('#download').addEventListener('click', download);
+      // start fetching the font writer once the pointer heads for the save bar
+      $('.savebar').addEventListener('pointerenter', () => warmWriter().catch(() => {}), { once: true });
+      $('#projects').addEventListener('change', (e) => openProject(e.target.value));
+      loadProjects();
+    }
     $('#upload').addEventListener('change', (e) => e.target.files[0] && upload(e.target.files[0]));
     document.addEventListener('dragover', (e) => e.preventDefault());
     document.addEventListener('drop', (e) => {
