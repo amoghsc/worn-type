@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Worn Type</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 font-family=%22serif%22>g</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Worn Type</h1>
+    <div class="field grow">
+      <span>Font</span>
+      <input id="familyFilter" type="search" placeholder="Filter…">
+      <select id="family"></select>
+    </div>
+    <div class="field">
+      <span>Weight</span>
+      <select id="style"></select>
+    </div>
+    <div class="field" hidden>
+      <span>Script</span>
+      <select id="script"></select>
+    </div>
+    <button id="deviceFonts" class="btn" hidden title="Let this page list the fonts installed on this device (Chrome, Edge)">Device fonts</button>
+    <label class="btn" title="Or drop a .ttf / .otf anywhere — it stays on your computer">Open font…<input id="upload" type="file" accept=".ttf,.otf" hidden></label>
+    <div class="field">
+      <span>Glyph</span>
+      <input id="char" value="g" maxlength="4" title="Type a character, or click any letter in the paragraph">
+    </div>
+  </header>
+
+  <div class="work">
+    <div class="left">
+      <section class="pair">
+        <div class="box">
+          <canvas id="orig" class="big"></canvas>
+          <span id="glyphLabel" class="corner mono"></span>
+        </div>
+        <div class="col">
+          <div class="box">
+            <canvas id="worn" class="big"></canvas>
+            <label class="corner"><input type="checkbox" id="ghost" checked> original outline</label>
+            <span id="variantLabel" class="corner right mono"></span>
+          </div>
+          <div id="thumbs" class="thumbs" title="The variations each glyph gets — click one to view it large"></div>
+        </div>
+      </section>
+
+      <section class="para">
+        <div class="paratools">
+          <label class="ptool" title="Font size">
+            <svg viewBox="0 0 24 24"><path d="M3 19 7.5 7 12 19M4.8 15h5.4M13 19l4-11 4 11M14.5 15h5"/></svg>
+            <input type="range" id="pSize" min="12" max="140" value="44"><output></output>
+          </label>
+          <label class="ptool" title="Line height">
+            <svg viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11M4 4v16M2 6l2-2 2 2M2 18l2 2 2-2"/></svg>
+            <input type="range" id="pLead" min="0.9" max="2.6" step="0.05" value="1.4"><output></output>
+          </label>
+          <label class="ptool" title="Letter spacing">
+            <svg viewBox="0 0 24 24"><path d="M5 14 8.5 4 12 14M6.2 10.5h4.6M13 4l3.5 10L20 4M3 19h18M3 19l2-2M3 19l2 2M21 19l-2-2M21 19l-2 2"/></svg>
+            <input type="range" id="pTrack" min="-60" max="200" step="5" value="0"><output></output>
+          </label>
+          <div class="seg icons" id="pAlign" title="Alignment">
+            <button data-a="left" class="on" title="Align left"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 10h12M3 14h18M3 18h12"/></svg></button>
+            <button data-a="center" title="Centre"><svg viewBox="0 0 24 24"><path d="M3 6h18M6 10h12M3 14h18M6 18h12"/></svg></button>
+            <button data-a="right" title="Align right"><svg viewBox="0 0 24 24"><path d="M3 6h18M9 10h12M3 14h18M9 18h12"/></svg></button>
+          </div>
+          <label class="swatch" title="Background colour"><input type="color" id="pBg" value="#ffffff"><span>BG</span></label>
+          <label class="swatch" title="Ink colour"><input type="color" id="pInk" value="#111111"><span>Ink</span></label>
+          <button id="pMode" class="switch" title="Toggle worn / original — or press T">
+            <span class="on">Worn</span><span>Original</span><kbd>T</kbd>
+          </button>
+          <button id="pAnim" class="switch anim" title="Animate — letters keep swapping between their variations, like hand-drawn film (or press A)">
+            <span><svg viewBox="0 0 24 24"><path class="play" d="M7 5v14l11-7z"/><path class="stop" d="M7 6h3.5v12H7zM13.5 6H17v12h-3.5z"/></svg>Animate</span><kbd>A</kbd>
+          </button>
+        </div>
+        <textarea id="pText" rows="2" spellcheck="false"></textarea>
+        <canvas id="para"></canvas>
+        <p class="hint">Click any letter to edit it (works for conjuncts too). Press <kbd>T</kbd> to flip between worn and original, <kbd>A</kbd> to animate.</p>
+      </section>
+    </div>
+
+    <aside class="controls" id="controls">
+      <div class="row">
+        <select id="preset" title="Start from a preset"></select>
+        <button id="reroll" class="btn" title="Same settings, new random pattern">New pattern <span id="seed" class="mono"></span></button>
+      </div>
+      <div id="sliders"></div>
+    </aside>
+  </div>
+
+  <footer class="savebar">
+    <label class="field"><span>Wear</span>
+      <select id="scope">
+        <option value="text">characters in the paragraph</option>
+        <option value="latin">A–Z a–z 0–9</option>
+        <option value="mapped">every character in the font</option>
+        <option value="all">every glyph (incl. conjuncts, half-forms)</option>
+        <option value="custom">custom characters…</option>
+      </select>
+    </label>
+    <input id="customChars" placeholder="type characters" hidden>
+    <span id="scopeCount" class="mono hint"></span>
+    <label class="field"><span>Name</span><span class="mono" id="familyBase"></span><input id="suffix" value="Worn" size="10"></label>
+    <label class="field"><span>Saved</span><select id="projects"><option value="">open a saved font…</option></select></label>
+    <p id="status" class="status"></p>
+    <button id="save" class="btn" title="Remember this font and its settings in this browser, to reopen and keep editing">Save font</button>
+    <button id="download" class="btn primary" title="Build the worn font and download the file. Check the source font's licence before sharing it.">Download</button>
+  </footer>
+
+  <script src="vendor/clipper.js"></script>
+  <script src="vendor/opentype.min.js"></script>
+  <script src="vendor/hbjs.js"></script>
+  <script src="wear.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
+.venv/
+.claude/
+.mcp.json
+.fontmeta.json
+output/
+uploads/
+__pycache__/
+.DS_Store
