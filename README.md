@@ -6,6 +6,8 @@ slightly different variations, so no two letters print quite alike.
 
 **Use it:** https://amoghsc.github.io/worn-type/ (Chrome, Edge, Firefox or Safari on a computer).
 
+**In Figma:** the [plugin](figma-plugin/README.md) wears selected text and shapes as vectors.
+
 ## How to use
 
 1. Pick a **font** and **weight**: any Google Font, or **Device fonts** for the fonts installed

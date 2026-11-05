@@ -63,9 +63,9 @@
 
   const fill = C.PolyFillType.pftNonZero;
 
-  function normalize(paths) {
+  function normalize(paths, rule = fill) {
     // resolves overlaps; outers come out with positive area, holes negative
-    return C.Clipper.SimplifyPolygons(paths, fill);
+    return C.Clipper.SimplifyPolygons(paths, rule);
   }
 
   function offset(paths, delta, join) {
@@ -101,7 +101,7 @@
   // ---------------------------------------------------------------- outline in / out
 
   // opentype.js path commands (font units, y-up) → clipper paths
-  function fromCommands(cmds, scale) {
+  function fromCommands(cmds, scale, rule) {
     const paths = [];
     let cur = null, x = 0, y = 0;
     const push = (px, py) => cur.push({ X: Math.round(px * scale), Y: Math.round(py * scale) });
@@ -134,7 +134,7 @@
       y = c.y;
     }
     if (cur && cur.length > 2) paths.push(cur);
-    return C.Clipper.CleanPolygons(normalize(paths), 0.3 * U);
+    return C.Clipper.CleanPolygons(normalize(paths, rule), 0.3 * U);
   }
 
   // insert points so no edge is longer than `step`

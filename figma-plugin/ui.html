@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: var(--figma-color-bg, #fff);
+  --ink: var(--figma-color-text, #111);
+  --muted: var(--figma-color-text-secondary, #6e6e6e);
+  --line: var(--figma-color-border, #dcdcdc);
+  --red: var(--figma-color-text-danger, #e0352b);
+}
+* { box-sizing: border-box; border-radius: 0 !important; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); font: 12px/1.4 Inter, system-ui, sans-serif;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden;
+}
+.stage { position: relative; border-bottom: 1px solid var(--line); }
+#preview { width: 100%; height: 190px; display: block; background: #fff; }
+#empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; color: #6e6e6e; background: #fff; }
+.stagebar { display: flex; align-items: center; gap: 8px; padding: 7px 16px; border-top: 1px solid var(--line); }
+#what { flex: 1; min-width: 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.controls { overflow-y: auto; padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+.row { display: flex; gap: 6px; }
+select {
+  flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); padding: 4px 6px;
+}
+.btn { font: inherit; border: 1px solid var(--ink); background: var(--bg); color: var(--ink); padding: 5px 12px; cursor: pointer; white-space: nowrap; }
+.btn.primary { background: var(--ink); color: var(--bg); font-weight: 500; }
+.btn.on { background: var(--ink); color: var(--bg); }
+.btn:disabled { opacity: .4; cursor: default; }
+.group { border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 2px; }
+.group h3 { margin: 0 0 3px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.sl { display: grid; grid-template-columns: 112px 1fr 32px; gap: 10px; align-items: center; height: 24px; white-space: nowrap; }
+.sl output { font-size: 11px; text-align: right; color: var(--muted); }
+.opts { grid-column: 2 / -1; display: flex; }
+.opts button { flex: 1; font: inherit; font-size: 11px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); padding: 2px 0; cursor: pointer; }
+.opts button + button { border-left: 0; }
+.opts button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; height: 14px; margin: 0; width: 100%; cursor: pointer; }
+input[type=range]:focus { outline: none; }
+input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--muted); }
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 11px; height: 9px; background: var(--ink); clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.bar { border-top: 1px solid var(--ink); padding: 8px 16px 4px; display: flex; flex-direction: column; gap: 6px; }
+.bar .row .btn { flex: 1; }
+#status { min-height: 16px; color: var(--muted); font-size: 11px; }
+#status.err { color: var(--red); }
+.credit { font-size: 9.5px; color: var(--muted); text-align: right; padding-bottom: 2px; }
+.credit a { color: inherit; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas id="preview"></canvas>
+    <div id="empty">Select text or shapes to wear them</div>
+    <div class="stagebar">
+      <span id="what"></span>
+      <button id="anim" class="btn" title="Preview the letters swapping variations, like hand-drawn film">Animate</button>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="row">
+      <select id="preset"></select>
+      <button id="reroll" class="btn" title="Keep the settings, reshuffle the wear">New pattern</button>
+    </div>
+    <div id="sliders"></div>
+  </div>
+  <div class="bar">
+    <div id="status"></div>
+    <div class="row">
+      <button id="boil" class="btn" title="One frame per variation, linked into a looping prototype" disabled>Make animated frames</button>
+      <button id="apply" class="btn primary" title="Replace the selection with worn vectors. The originals stay, hidden." disabled>Apply</button>
+    </div>
+    <div class="credit">Created with Love using Claude code by Amogh (<a href="mailto:amoghsc@gmail.com">amoghsc@gmail.com</a>)</div>
+  </div>
+  <script src="../public/vendor/clipper.js"></script>
+  <script src="../public/wear.js"></script>
+  <script src="../public/recipes.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>
